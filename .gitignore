@@ -1,3 +1,9 @@
+# Don't add input data
+data/
+
+# Don't add notebooks (use jupytext representation)
+.ipynb
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
