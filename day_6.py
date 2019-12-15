@@ -47,6 +47,18 @@ class TestDay6_part1(unittest.TestCase):
 
 
 # %%
+class TestDay6_part2(unittest.TestCase):
+    """Tests for day 6, part 2."""
+    def test_bodies(self):
+        system = System('./data/day6/test2.txt')
+        self.assertEqual(len(system), 14)
+    
+    def test_example_1(self):
+        system = System('./data/day6/test2.txt')
+        self.assertEqual(system.distance('YOU', 'SAN'), 4)
+
+
+# %%
 class System(nx.DiGraph):
     def __init__(self, input_file):
         with open(input_file, 'r') as file:
@@ -66,7 +78,17 @@ class System(nx.DiGraph):
     @property
     def checksum(self):
         return sum(self.orbits.values())
+    
+    def distance(self, origin, destination):
+        source = list(self.predecessors(origin))[0]
+        target = list(self.predecessors(destination))[0]
+        # directed graph limits transfer paths
+        shortest_path = nx.shortest_path(self.to_undirected(), source, target)
+        return len(shortest_path) - 1
 
+
+# %%
+unittest.main(argv=['ignored', '-v'], exit=False)
 
 # %%
 solution = System("./data/day6/input.txt")
@@ -75,8 +97,4 @@ solution = System("./data/day6/input.txt")
 solution.checksum
 
 # %%
-unittest.main(argv=['ignored', '-v'], exit=False)
-
-# %%
-
-# %%
+solution.distance('YOU', 'SAN')
