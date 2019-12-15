@@ -7,9 +7,9 @@
 #       format_version: '1.3'
 #       jupytext_version: 1.3.0
 #   kernelspec:
-#     display_name: Python (development)
+#     display_name: Python 3 (adventofcode)
 #     language: python
-#     name: development
+#     name: adventofcode
 # ---
 
 # %% [markdown]
@@ -18,76 +18,65 @@
 # %%
 import unittest
 import attr
+import networkx as nx
 from typing import Union
 
 
 # %%
-class TestDay6(unittest.TestCase):
-    """Tests for day 6."""
+class TestDay6_part1(unittest.TestCase):
+    """Tests for day 6, part 1."""
     def test_bodies(self):
-        system = System('./data/day6/test.txt')
-        self.assertEqual(len(system.bodies), 12)
+        system = System('./data/day6/test1.txt')
+        self.assertEqual(len(system), 12)
     
     def test_example_1(self):
-        system = System('./data/day6/test.txt')
-        self.assertEqual(system.orbits('D'), 3)
+        system = System('./data/day6/test1.txt')
+        self.assertEqual(system.orbits['D'], 3)
     
     def test_example_2(self):
-        system = System('./data/day6/test.txt')
-        self.assertEqual(system.orbits('L'), 7)
+        system = System('./data/day6/test1.txt')
+        self.assertEqual(system.orbits['L'], 7)
     
     def test_example_3(self):
-        system = System('./data/day6/test.txt')
-        self.assertEqual(system.orbits('COM'), 0)
+        system = System('./data/day6/test1.txt')
+        self.assertEqual(system.orbits['COM'], 0)
     
     def test_example_4(self):
-        system = System('./data/day6/test.txt')
-        self.assertEqual(system.orbits(), 42)
+        system = System('./data/day6/test1.txt')
+        self.assertEqual(system.checksum, 42)
 
 
 # %%
-@attr.s(auto_attribs=True)
-class Body:
-    name: str
-    parent: Union["Body", None] = attr.ib(default=None)
+class System(nx.DiGraph):
+    def __init__(self, input_file):
+        with open(input_file, 'r') as file:
+            data = file.read().splitlines() 
+        super().__init__([line.split(')') for line in data])
+    
+    @property
+    def origin(self):
+        origin = [key for key, value in self.pred.items() if not value]
+        assert len(origin) == 1
+        return origin[0]
     
     @property
     def orbits(self):
-        if self.parent is None:
-            return 0
-        else:
-            return 1 + self.parent.orbits
-
-
-# %%
-class System:
-    def __init__(self, input_file):
-        with open(input_file, 'r') as file:
-            input_data = file.read().splitlines() 
-        self.bodies = dict()
-        for line in input_data:
-            data = line.split(')')
-            if data[0] not in self.bodies:
-                self.add_body(name=data[0], parent=None)
-            self.add_body(name=data[1] , parent=self.bodies[data[0]])
+        return nx.single_source_shortest_path_length(self, self.origin)
     
-    def add_body(self, name, parent):
-        self.bodies.update({name: Body(name, parent)})
-    
-    def orbits(self, body=None):
-        if body is None:
-            return sum([body.orbits for body in self.bodies.values()])
-        else:
-            return self.bodies[body].orbits
+    @property
+    def checksum(self):
+        return sum(self.orbits.values())
 
 
 # %%
 solution = System("./data/day6/input.txt")
 
 # %%
-solution.orbits()
+solution.checksum
 
 # %%
 unittest.main(argv=['ignored', '-v'], exit=False)
+
+# %%
 
 # %%
