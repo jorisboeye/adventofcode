@@ -2,7 +2,7 @@
 data/
 
 # Don't add notebooks (use jupytext representation)
-.ipynb
+*.ipynb
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
