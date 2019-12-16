@@ -1,5 +1,5 @@
 # Don't add input data
-data/
+data/*/input.txt
 
 # Don't add notebooks (use jupytext representation)
 *.ipynb
